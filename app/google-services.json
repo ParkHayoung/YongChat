@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "918851689889",
+    "firebase_url": "https://yongchat-3ce5c.firebaseio.com",
+    "project_id": "yongchat-3ce5c",
+    "storage_bucket": "yongchat-3ce5c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918851689889:android:5a89f33a3f157201",
+        "android_client_info": {
+          "package_name": "com.example.hayoung.yongchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918851689889-p0f8ao37juvrn02dpo33odlf7vi85lfm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhRbvhQ7vFFTPA-2xG4Rvi3jY6OOi6UWk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

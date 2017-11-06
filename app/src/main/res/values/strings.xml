@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">YongChat</string>
+    <string name="facebook_app_id">216325542241555</string>
+    <string name="fb_login_protocol_scheme">fb216325542241555</string>
+    <string name="edittext_hint"><font size="12">추가할 친구의 이메일 주소를 입력해주세요.</font></string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
