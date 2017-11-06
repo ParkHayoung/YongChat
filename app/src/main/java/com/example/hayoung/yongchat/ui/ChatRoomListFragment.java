@@ -4,11 +4,9 @@ package com.example.hayoung.yongchat.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +14,8 @@ import android.view.ViewGroup;
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.RoomRecyclerAdapter;
 import com.example.hayoung.yongchat.model.ChatRoom;
+import com.example.hayoung.yongchat.model.User;
+import com.example.hayoung.yongchat.session.UserSession;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,7 +64,9 @@ public class ChatRoomListFragment extends Fragment {
     }
 
     private void loadRooms() {
-        mRoomsRef.addValueEventListener(new ValueEventListener() {
+        User me = UserSession.getInstance().getCurrentUser();
+
+        mRoomsRef.orderByChild("userId").equalTo(me.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<ChatRoom> chatRoomList = new ArrayList<>();

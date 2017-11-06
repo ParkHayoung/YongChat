@@ -1,14 +1,17 @@
 package com.example.hayoung.yongchat.model;
 
-import android.net.Uri;
-
 import com.google.firebase.auth.FirebaseUser;
+
+import java.io.Serializable;
 
 /**
  * Created by hayoung on 2017. 11. 5..
  */
 
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1293948272773842807L;
+
     String uid;
     String email;
     String name;
