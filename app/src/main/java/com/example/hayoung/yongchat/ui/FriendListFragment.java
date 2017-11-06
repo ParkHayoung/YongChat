@@ -16,9 +16,6 @@ import android.widget.Toast;
 
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.FriendRecyclerAdapter;
-import com.example.hayoung.yongchat.model.ChatRoom;
-import com.example.hayoung.yongchat.model.User;
-import com.example.hayoung.yongchat.session.UserSession;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,9 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -106,15 +101,18 @@ public class FriendListFragment extends Fragment {
     }
 
     private void searchAndAddFriend(String email) {
-        mUserRef.orderByChild("email").equalTo(email).addValueEventListener(new ValueEventListener() {
+        mUserRef.orderByChild("email").equalTo(email.trim().toLowerCase()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
+                if (dataSnapshot.getChildrenCount() == 0) {
+                    Toast.makeText(getContext(), "없당", Toast.LENGTH_SHORT).show();
+                    return ;
+                }
 
+                Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
                 while (iterator.hasNext()) {
                     Toast.makeText(getContext(), "있당", Toast.LENGTH_SHORT).show();
 //                    test.setText("있당");
-
                 }
 
             }
@@ -125,7 +123,7 @@ public class FriendListFragment extends Fragment {
             }
         });
 
-        Toast.makeText(getContext(), "없당", Toast.LENGTH_SHORT).show();
+
 
 
 

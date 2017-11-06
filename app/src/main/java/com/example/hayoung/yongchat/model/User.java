@@ -24,6 +24,9 @@ public class User implements Serializable {
     public User(FirebaseUser firebaseUser) {
         uid = firebaseUser.getUid();
         email = firebaseUser.getEmail();
+        if (email != null) {
+            email = email.trim().toLowerCase();
+        }
         name = firebaseUser.getDisplayName();
         imageUrl = firebaseUser.getPhotoUrl().toString();
     }
