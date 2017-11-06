@@ -1,26 +1,28 @@
 package com.example.hayoung.yongchat.model;
 
+import java.util.List;
+
 /**
  * Created by hayoung on 2017. 11. 5..
  */
 
 public class Friends {
-    String userId;
-    String friendId;
+    String uid;
+    List<User> friends;
 
-    public String getUserId() {
-        return userId;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
-    public String getFriendId() {
-        return friendId;
+    public List<User> getFriends() {
+        return friends;
     }
 
-    public void setFriendId(String friendId) {
-        this.friendId = friendId;
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
     }
 }

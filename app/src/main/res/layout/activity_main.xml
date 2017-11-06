@@ -58,9 +58,7 @@
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/view"
-        android:layout_alignParentStart="true" />
-
-
+        android:layout_above="@id/view"
+        android:layout_below="@id/toolbar" />
 
 </RelativeLayout>

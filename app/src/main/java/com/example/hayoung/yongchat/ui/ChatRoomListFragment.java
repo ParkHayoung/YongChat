@@ -41,8 +41,6 @@ public class ChatRoomListFragment extends Fragment {
         mDb = FirebaseDatabase.getInstance();
         mRoomsRef = mDb.getReference("rooms");
         mRoomRecyclerAdapter = new RoomRecyclerAdapter();
-
-        loadRooms();
     }
 
     @Override
@@ -57,10 +55,12 @@ public class ChatRoomListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyler_view);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mRoomRecyclerAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+
+        loadRooms();
     }
 
     private void loadRooms() {

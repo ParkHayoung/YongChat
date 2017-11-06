@@ -6,16 +6,9 @@
     tools:context="com.example.hayoung.yongchat.ui.FriendListFragment">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyler_view"
-        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <TextView
-        android:id="@+id/test"
-        android:text="test"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
