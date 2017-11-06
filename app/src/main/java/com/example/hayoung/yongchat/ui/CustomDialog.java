@@ -17,7 +17,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
     private CustomDialogClickListener listener;
 
     public interface CustomDialogClickListener {
-        void onDialogSearchButtonClick(String text);
+        void onDialogSearchButtonClick(String email);
         void onDialogCancelButtonClick();
     }
 
