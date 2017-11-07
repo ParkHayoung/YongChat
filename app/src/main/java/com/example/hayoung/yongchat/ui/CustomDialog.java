@@ -1,7 +1,9 @@
 package com.example.hayoung.yongchat.ui;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -49,10 +51,11 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
                 break;
             case R.id.cancel_btn:
                 listener.onDialogCancelButtonClick();
+                dismiss();
                 break;
             default:
                 break;
         }
-        dismiss();
+//        dismiss();
     }
 }

@@ -5,7 +5,10 @@
     <color name="fabPressed">#6EB5F7</color>
     <color name="fabRipple">#edd5a8</color>
 
-    <color name="colorPrimary">#f1b266</color>
-    <color name="colorPrimaryDark">#ac8951</color>
-    <color name="colorAccent">#ef6664</color>
+    <color name="colorPrimary">#fdc23e</color>
+    <color name="colorPrimaryDark">#f9a11b</color>
+    <color name="colorAccent">#ff7761</color>
+    
+    <color name="buttonColor">#274555</color>
+    <color name="buttonPressedColor">#393354</color>
 </resources>

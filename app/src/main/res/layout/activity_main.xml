@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="YongChat"
-                android:textColor="#ffffff"
+                android:textColor="#274555"
                 android:textStyle="bold"
                 android:textSize="20sp"/>
 

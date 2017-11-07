@@ -1,11 +1,13 @@
 package com.example.hayoung.yongchat.ui;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DividerItemDecoration;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.FriendRecyclerAdapter;
+import com.example.hayoung.yongchat.listener.RecyclerItemClickListener;
 import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.session.UserSession;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,8 +91,6 @@ public class FriendListFragment extends Fragment {
                     public void onDialogSearchButtonClick(String email) {
                         if(email.equals(mFirebaseUser.getEmail())) {
                             Toast.makeText(getContext(), "자신은 친구로 등록할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                            //dialog 안 꺼지도록
-
                         } else {
                             //친구 등록 기능 구현
                             searchAndAddFriend(email);
@@ -100,16 +101,46 @@ public class FriendListFragment extends Fragment {
                     public void onDialogCancelButtonClick() {
                     }
                 });
+                dialog.setCanceledOnTouchOutside(false);
                 dialog.show();
             }
         });
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(mFriendRecyclerAdapter);
 
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getApplicationContext(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+
+                    @Override
+                    public void onItemClick(View view, int position) {
+//                        Toast.makeText(getApplicationContext(),position+"번 째 아이템 클릭",Toast.LENGTH_SHORT).show();
+                        Snackbar.make(view, mFriendRecyclerAdapter.getFriendName(position) + "님 과 대화하시겠습니까?", Snackbar.LENGTH_SHORT)
+                                .setAction("OK", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //ChatActivity 로 이동
+                                        startChat();
+                                    }
+                                }).show();
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+//                        Toast.makeText(getApplicationContext(),position+"번 째 아이템 길게 클릭",Toast.LENGTH_SHORT).show();
+                    }
+                })
+        );
+
         loadFriendList();
+    }
+
+    private void startChat() {
+        Intent chatIntent = new Intent(FriendListFragment.this.getContext(), ChatActivity.class);
+        startActivity(chatIntent);
+
     }
 
     private void loadFriendList() {
@@ -162,6 +193,7 @@ public class FriendListFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getChildrenCount() == 0) {
                     // 친구 추가
+                    Toast.makeText(getContext(), "친구 추가가 완료되었습니다.", Toast.LENGTH_SHORT).show();
                     mFriendRef.child(me.getUid()).push().setValue(user);
                 } else {
                     // 이미 친구로 등록되어있음

@@ -26,6 +26,7 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
         return items;
     }
 
+
     public void setItems(List<User> items) {
         this.items = items;
     }
@@ -55,6 +56,11 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
         }
         return items.size();
     }
+
+    public String getFriendName(int position) {
+        return items.get(position).getName();
+    }
+
 
     public static class FriendViewHolder extends RecyclerView.ViewHolder {
 

@@ -29,6 +29,8 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:clickable="true"
+            android:theme="@style/MyButton"
+            android:textColor="#ffffff"
             android:text="추가"
             android:textStyle="bold" />
 
@@ -37,6 +39,8 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
+            android:theme="@style/MyButton"
+            android:textColor="#ffffff"
             android:clickable="true"
             android:text="취소"
             android:textStyle="bold" />
