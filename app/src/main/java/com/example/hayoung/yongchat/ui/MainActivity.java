@@ -14,10 +14,14 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.MainPagerAdapter;
+import com.example.hayoung.yongchat.model.User;
+import com.example.hayoung.yongchat.session.UserSession;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
@@ -34,11 +38,9 @@ public class MainActivity extends AppCompatActivity {
         mTabLayout.setupWithViewPager(mViewPager);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(Color.WHITE);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
     }
 
     @Override
@@ -56,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("아니오", null)
                 .show();
-
     }
 
 }

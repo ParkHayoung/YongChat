@@ -7,6 +7,28 @@
     android:orientation="vertical"
     tools:context="com.example.hayoung.yongchat.ui.ChatActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/user_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="#274555"
+                android:textStyle="bold"
+                android:textSize="20sp"/>
+        </FrameLayout>
+    </android.support.v7.widget.Toolbar>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chat_recycler_view"
         android:layout_width="match_parent"
@@ -20,10 +42,11 @@
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:background="#ccc"
-        android:layout_above="@id/tab_layout"
+        android:layout_above="@id/input_layout"
         android:id="@+id/view" />
 
     <LinearLayout
+        android:id="@+id/input_layout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:paddingLeft="8dp"

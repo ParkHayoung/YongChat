@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.FriendRecyclerAdapter;
 import com.example.hayoung.yongchat.listener.RecyclerItemClickListener;
+import com.example.hayoung.yongchat.model.ChatRoom;
 import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.session.UserSession;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -112,17 +116,17 @@ public class FriendListFragment extends Fragment {
         recyclerView.setAdapter(mFriendRecyclerAdapter);
 
         recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getApplicationContext(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-
+                new RecyclerItemClickListener(getContext(), recyclerView, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
+                        final User friend = mFriendRecyclerAdapter.getUser(position);
 //                        Toast.makeText(getApplicationContext(),position+"번 째 아이템 클릭",Toast.LENGTH_SHORT).show();
-                        Snackbar.make(view, mFriendRecyclerAdapter.getFriendName(position) + "님 과 대화하시겠습니까?", Snackbar.LENGTH_SHORT)
+                        Snackbar.make(view, friend.getName() + "님 과 대화하시겠습니까?", Snackbar.LENGTH_SHORT)
                                 .setAction("OK", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         //ChatActivity 로 이동
-                                        startChat();
+                                        startChat(friend);
                                     }
                                 }).show();
                     }
@@ -137,8 +141,22 @@ public class FriendListFragment extends Fragment {
         loadFriendList();
     }
 
-    private void startChat() {
-        Intent chatIntent = new Intent(FriendListFragment.this.getContext(), ChatActivity.class);
+    private void startChat(User friend) {
+        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+
+        DatabaseReference roomsRef = FirebaseDatabase.getInstance().getReference("rooms");
+        User me = UserSession.getInstance().getCurrentUser();
+        ChatRoom chatRoom = new ChatRoom();
+
+        chatRoom.setMembers(Arrays.asList(friend));
+        chatRoom.setUnreadCount(chatRoom.getMembers().size() - 1);
+        chatRoom.setUserId(me.getUid());
+        chatRoom.setDateTime(new Date());
+        roomsRef.push().setValue(chatRoom);
+
+        chatIntent.putExtra("userId", friend.getUid());
+        chatIntent.putExtra("userName", friend.getName());
+
         startActivity(chatIntent);
 
     }
