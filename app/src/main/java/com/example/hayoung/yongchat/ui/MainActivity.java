@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton("아니오", null)
+                .setCancelable(false)
                 .show();
     }
 

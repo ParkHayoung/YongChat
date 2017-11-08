@@ -10,14 +10,16 @@ import android.widget.TextView;
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.model.TextMessage;
 
-import org.w3c.dom.Text;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * Created by hayoung on 2017. 11. 5..
  */
 
 public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapter.ChatViewHolder> {
-
+    private List<TextMessage> items;
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
     @Override
     public ChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -28,6 +30,13 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
 
     @Override
     public void onBindViewHolder(ChatViewHolder holder, int position) {
+        TextMessage textMessage = items.get(position);
+
+        holder.dateTextView.setText(dateFormat.format(textMessage.getDate()));
+        holder.messageTextView.setText(textMessage.getMessage());
+        holder.nameTextView.setText(textMessage.getSent().getName());
+//        holder.profileImageView.;
+        holder.unreadCountTextView.setText(textMessage.getUnreadCount());
 
     }
 
@@ -52,5 +61,9 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
             unreadCountTextView = (TextView) itemView.findViewById(R.id.unread_count_text_view);
             dateTextView = (TextView) itemView.findViewById(R.id.date_text_view);
         }
+    }
+
+    public void setItems(List<TextMessage> items) {
+        this.items = items;
     }
 }

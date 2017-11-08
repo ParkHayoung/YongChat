@@ -1,13 +1,16 @@
 package com.example.hayoung.yongchat.model;
 
+import java.util.Date;
+
 /**
  * Created by hayoung on 2017. 11. 5..
  */
 
 public class TextMessage {
     String message;
+    Date date;
     User sent;
-    String chatRoomId;
+    String roomId;
     int unreadCount;
 
     public String getMessage() {
@@ -26,12 +29,12 @@ public class TextMessage {
         this.sent = sent;
     }
 
-    public String getChatRoomId() {
-        return chatRoomId;
+    public String getRoomId() {
+        return roomId;
     }
 
-    public void setChatRoomId(String chatRoomId) {
-        this.chatRoomId = chatRoomId;
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
     }
 
     public int getUnreadCount() {
@@ -40,5 +43,13 @@ public class TextMessage {
 
     public void setUnreadCount(int unreadCount) {
         this.unreadCount = unreadCount;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 }

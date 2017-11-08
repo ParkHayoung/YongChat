@@ -18,7 +18,6 @@ import java.util.List;
 
 public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapter.RoomViewHolder> {
 
-    private ChatRoom chatRoom;
     private List<ChatRoom> items;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yy/MM/dd HH:mm");
 
@@ -61,7 +60,7 @@ public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapte
     }
 
     public ChatRoom getChatRoom(int position) {
-        return chatRoom;
+        return items.get(position);
     }
 
     public void setItems(List<ChatRoom> items) {
