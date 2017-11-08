@@ -131,7 +131,11 @@ public class LoginActivity extends AppCompatActivity {
                     chatRoom.setMessage("나와의 즐거운 대화를 시작해보자.");
                     chatRoom.setDateTime(new Date());
                     chatRoom.setUserId(user.getUid());
-                    roomsRef.push().setValue(chatRoom);
+                    chatRoom.setTag(user.getUid());
+
+                    String roomId = roomsRef.push().getKey();
+                    roomsRef.child(roomId).setValue(chatRoom);
+
 
                     goToMain();
                 } else {

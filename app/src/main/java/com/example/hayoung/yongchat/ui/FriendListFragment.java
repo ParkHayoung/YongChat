@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
@@ -141,23 +140,49 @@ public class FriendListFragment extends Fragment {
         loadFriendList();
     }
 
-    private void startChat(User friend) {
-        Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+    private void startChat(final User friend) {
+        final User me = UserSession.getInstance().getCurrentUser();
+        final DatabaseReference roomsRef = FirebaseDatabase.getInstance().getReference("rooms");
+        roomsRef.orderByChild("tag").equalTo(friend.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ChatRoom chatRoom;
 
-        DatabaseReference roomsRef = FirebaseDatabase.getInstance().getReference("rooms");
-        User me = UserSession.getInstance().getCurrentUser();
-        ChatRoom chatRoom = new ChatRoom();
+                if (dataSnapshot.getChildrenCount() > 0) {
+                    // 해당 친구와의 1:1 대화방이 있다면, 그 채팅방으로 이동
+                    DataSnapshot itemSnapshot = dataSnapshot.getChildren().iterator().next();
+                    chatRoom = itemSnapshot.getValue(ChatRoom.class);
+                } else {
+                    // 없다면, 새로운 채팅방을 생성하고, Friend 의 roomId 에 채팅방의 key를 저장
+                    chatRoom = new ChatRoom();
+                    chatRoom.setMembers(Arrays.asList(friend));
+                    chatRoom.setUnreadCount(chatRoom.getMembers().size() - 1);
+                    chatRoom.setUserId(me.getUid());
+                    chatRoom.setDateTime(new Date());
+                    chatRoom.setTag(friend.getUid());
+                }
 
-        chatRoom.setMembers(Arrays.asList(friend));
-        chatRoom.setUnreadCount(chatRoom.getMembers().size() - 1);
-        chatRoom.setUserId(me.getUid());
-        chatRoom.setDateTime(new Date());
-        roomsRef.push().setValue(chatRoom);
+                if (chatRoom != null) {
+                    Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+                    chatIntent.putExtra(ChatActivity.EXTRA_KEY_CHAT_ROOM, chatRoom);
+                    startActivity(chatIntent);
+                } else {
+                    Toast.makeText(getActivity(), "뭔가 잘못되었어. 더이상 진행할 수가 없어!", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        chatIntent.putExtra("userId", friend.getUid());
-        chatIntent.putExtra("userName", friend.getName());
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-        startActivity(chatIntent);
+            }
+        });
+
+        // 새로운 채팅방 생성
+
+
+
+
+
 
     }
 
