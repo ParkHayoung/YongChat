@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="1px"
         android:background="#ccc"
-        android:layout_above="@id/input_layout"
+        android:layout_above="@+id/input_layout"
         android:id="@+id/view" />
 
     <LinearLayout
