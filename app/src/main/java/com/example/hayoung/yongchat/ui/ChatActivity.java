@@ -1,5 +1,6 @@
 package com.example.hayoung.yongchat.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.tsengvn.typekit.TypekitContextWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,11 +69,9 @@ public class ChatActivity extends AppCompatActivity {
                 if(mChatEditText.getText().length() > 0) {
                     sendTextMessage(mChatEditText.getText().toString());
                     mChatEditText.setText("");
-//                    loadChat();
                 } else {
                     return;
                 }
-//                loadChat(mMyRoom.getRoomId());
                 loadChat();
             }
         });
@@ -157,11 +157,6 @@ public class ChatActivity extends AppCompatActivity {
 
                         mRoomsRef.child(room.getRoomId()).setValue(room);
                     }
-
-
-
-
-
                 }
 
                 @Override
@@ -205,6 +200,6 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-
     }
+
 }
