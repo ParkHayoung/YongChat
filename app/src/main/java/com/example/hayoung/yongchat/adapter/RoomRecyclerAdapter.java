@@ -33,16 +33,9 @@ public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapte
     public void onBindViewHolder(RoomViewHolder holder, int position) {
         ChatRoom chatRoom = items.get(position);
 
-        String title;
-        if (chatRoom.getMembers().size() == 1) {
-            title = chatRoom.getMembers().get(0).getName();
-        } else {
-            title = chatRoom.getMembers().get(0).getName() + " 외 " + (chatRoom.getMembers().size() - 1) + "명";
-        }
-        holder.titleTextView.setText(title);
-
+        holder.titleTextView.setText(chatRoom.getTitle());
         holder.messageTextView.setText(chatRoom.getMessage());
-        holder.unreadCountTextView.setText(String.valueOf(chatRoom.getUnreadCount()));
+//        holder.unreadCountTextView.setText(String.valueOf(chatRoom.getUnreadCount()));
         holder.dateTextView.setText(dateFormat.format(chatRoom.getDateTime()));
 
     }
@@ -53,10 +46,6 @@ public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapte
             return 0;
         }
         return items.size();
-    }
-
-    public List<ChatRoom> getItems() {
-        return items;
     }
 
     public ChatRoom getChatRoom(int position) {

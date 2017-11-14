@@ -15,12 +15,21 @@ import java.util.List;
 public class ChatRoom implements Parcelable {
 
     String roomId;
+    String title;
     List<User> members;
     String message;
     int unreadCount;
     Date dateTime;
     String userId;
     String tag;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public List<User> getMembers() {
         return members;
@@ -92,6 +101,7 @@ public class ChatRoom implements Parcelable {
         dest.writeString(this.userId);
         dest.writeString(this.tag);
         dest.writeString(this.roomId);
+        dest.writeString(this.title);
     }
 
     public ChatRoom() {
@@ -107,6 +117,7 @@ public class ChatRoom implements Parcelable {
         this.userId = in.readString();
         this.tag = in.readString();
         this.roomId = in.readString();
+        this.title = in.readString();
     }
 
     public static final Creator<ChatRoom> CREATOR = new Creator<ChatRoom>() {

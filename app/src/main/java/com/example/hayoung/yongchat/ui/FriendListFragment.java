@@ -155,7 +155,8 @@ public class FriendListFragment extends Fragment {
                 } else {
                     // 없다면, 새로운 채팅방을 생성하고, Friend 의 roomId 에 채팅방의 key를 저장
                     chatRoom = new ChatRoom();
-                    chatRoom.setMembers(Arrays.asList(friend));
+                    chatRoom.setMembers(Arrays.asList(friend, me));
+                    chatRoom.setTitle(friend.getName());
                     chatRoom.setUnreadCount(chatRoom.getMembers().size() - 1);
                     chatRoom.setUserId(me.getUid());
                     chatRoom.setDateTime(new Date());

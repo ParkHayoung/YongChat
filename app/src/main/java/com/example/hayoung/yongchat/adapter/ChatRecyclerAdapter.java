@@ -1,5 +1,6 @@
 package com.example.hayoung.yongchat.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,10 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.model.TextMessage;
+import com.example.hayoung.yongchat.model.User;
+import com.example.hayoung.yongchat.session.UserSession;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,13 +24,28 @@ import java.util.List;
  */
 
 public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapter.ChatViewHolder> {
-    private List<TextMessage> items;
+
+    private static final int TYPE_TM_ME = 0;
+    private static final int TYPE_TM_YOU = 1;
+
+    private List<TextMessage> items = new ArrayList<>();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+    private User me;
+
+    public ChatRecyclerAdapter() {
+        me = UserSession.getInstance().getCurrentUser();
+    }
 
     @Override
     public ChatViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View view = inflater.inflate(R.layout.item_chat_left, parent, false);
+
+        View view = null;
+        if (viewType == TYPE_TM_ME) {
+            view = inflater.inflate(R.layout.item_chat_tm_me, parent, false);
+        } else if (viewType == TYPE_TM_YOU) {
+            view = inflater.inflate(R.layout.item_chat_tm_you, parent, false);
+        }
         return new ChatViewHolder(view);
     }
 
@@ -35,14 +56,30 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         holder.dateTextView.setText(dateFormat.format(textMessage.getDate()));
         holder.messageTextView.setText(textMessage.getMessage());
         holder.nameTextView.setText(textMessage.getSent().getName());
-//        holder.profileImageView.;
-        holder.unreadCountTextView.setText(textMessage.getUnreadCount());
+//        holder.unreadCountTextView.setText(String.valueOf(textMessage.getUnreadCount()));
 
+        Glide.with(holder.profileImageView)
+                .load(items.get(position).getSent().getImageUrl())
+                .apply(RequestOptions.circleCropTransform())
+                .into(holder.profileImageView);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        TextMessage textMessage = items.get(position);
+        if (textMessage.getSent().getUid().equals(me.getUid())) {
+            return TYPE_TM_ME;
+        } else {
+            return TYPE_TM_YOU;
+        }
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        if (items == null) {
+            return 0;
+        }
+        return items.size();
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
@@ -63,7 +100,11 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         }
     }
 
-    public void setItems(List<TextMessage> items) {
+    public void setItems(@NonNull List<TextMessage> items) {
         this.items = items;
+    }
+
+    public List<TextMessage> getItems() {
+        return items;
     }
 }

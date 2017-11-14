@@ -10,7 +10,6 @@ public class TextMessage {
     String message;
     Date date;
     User sent;
-    String roomId;
     int unreadCount;
 
     public String getMessage() {
@@ -27,14 +26,6 @@ public class TextMessage {
 
     public void setSent(User sent) {
         this.sent = sent;
-    }
-
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
     }
 
     public int getUnreadCount() {

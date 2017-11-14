@@ -125,16 +125,17 @@ public class LoginActivity extends AppCompatActivity {
                     // 로컬 사용자 세션에 사용자 등록
                     UserSession.getInstance().setCurrentUser(user);
 
-                    ChatRoom chatRoom = new ChatRoom();
-                    chatRoom.setUnreadCount(0);
-                    chatRoom.setMembers(Arrays.asList(user));
-                    chatRoom.setMessage("나와의 즐거운 대화를 시작해보자.");
-                    chatRoom.setDateTime(new Date());
-                    chatRoom.setUserId(user.getUid());
-                    chatRoom.setTag(user.getUid());
-
-                    String roomId = roomsRef.push().getKey();
-                    roomsRef.child(roomId).setValue(chatRoom);
+//                    ChatRoom chatRoom = new ChatRoom();
+//                    chatRoom.setUnreadCount(0);
+//                    chatRoom.setMembers(Arrays.asList(user));
+//                    chatRoom.setMessage("나와의 즐거운 대화를 시작해보자.");
+//                    chatRoom.setDateTime(new Date());
+//                    chatRoom.setUserId(user.getUid());
+//                    chatRoom.setTag(user.getUid());
+//
+//                    String roomId = roomsRef.push().getKey();
+//                    chatRoom.setRoomId(roomId);
+//                    roomsRef.child(roomId).setValue(chatRoom);
 
 
                     goToMain();
