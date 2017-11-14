@@ -44,7 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ChatActivity extends AppCompatActivity {
 
     public static final String EXTRA_KEY_CHAT_ROOM = "chatRoom";
-    private static final String FCM_API_KEY = "AAAA1e_UHaE:APA91bG_aSZS2P3yPAaasQjxCByZ93ObcY1vYIt89kU3P_ydFH4SnaWpDIds7lSSbbAF8d0cmBAE9wdlB8Lbv9E3Li7gRgPEGt8WGoY73vR30WkKna8lzlce2SrZhlkWuCZQCxww5ivF";
+    private static final String FCM_API_KEY = "AIzaSyAaWYAlTEt3d_5y7gm3NNtltWplDoeXTgo";
 
     private ChatRoom mMyRoom;
     private DatabaseReference mRoomsRef;
