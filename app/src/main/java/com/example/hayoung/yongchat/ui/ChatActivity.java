@@ -1,11 +1,12 @@
 package com.example.hayoung.yongchat.ui;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.ChatRecyclerAdapter;
+import com.example.hayoung.yongchat.api.FcmApi;
+import com.example.hayoung.yongchat.api.FcmSendMessageBody;
 import com.example.hayoung.yongchat.model.ChatRoom;
 import com.example.hayoung.yongchat.model.TextMessage;
 import com.example.hayoung.yongchat.model.User;
@@ -22,7 +25,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.tsengvn.typekit.TypekitContextWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,9 +32,19 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class ChatActivity extends AppCompatActivity {
 
     public static final String EXTRA_KEY_CHAT_ROOM = "chatRoom";
+    private static final String FCM_API_KEY = "AAAA1e_UHaE:APA91bG_aSZS2P3yPAaasQjxCByZ93ObcY1vYIt89kU3P_ydFH4SnaWpDIds7lSSbbAF8d0cmBAE9wdlB8Lbv9E3Li7gRgPEGt8WGoY73vR30WkKna8lzlce2SrZhlkWuCZQCxww5ivF";
 
     private ChatRoom mMyRoom;
     private DatabaseReference mRoomsRef;
@@ -157,6 +169,8 @@ public class ChatActivity extends AppCompatActivity {
 
                         mRoomsRef.child(room.getRoomId()).setValue(room);
                     }
+
+                    sendFcmToRecipients(textMessage);
                 }
 
                 @Override
@@ -165,6 +179,55 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void sendFcmToRecipients(@NonNull TextMessage textMessage) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://fcm.googleapis.com")
+                .build();
+
+
+        User me = UserSession.getInstance().getCurrentUser();
+        List<User> recipients = new ArrayList<>();
+        for (User user: mMyRoom.getMembers()) {
+            if (!user.getUid().equals(me.getUid())) {
+                recipients.add(user);
+            }
+        }
+        FcmSendMessageBody body = new FcmSendMessageBody(
+                mMyRoom.getRoomId(),
+                me,
+                recipients,
+                textMessage);
+
+        FcmApi api = retrofit.create(FcmApi.class);
+        Call<ResponseBody> call = api.sendMessage("key=" + FCM_API_KEY, body);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    ResponseBody body = response.body();
+                    if (body != null) {
+                        Log.e(ChatActivity.class.getSimpleName(), body.string());
+                    }
+                } catch (Exception e) {
+                    Log.e(ChatActivity.class.getSimpleName(), e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e(ChatActivity.class.getSimpleName(), t.getMessage(), t);
+            }
+        });
     }
 
     private void createChatRoom() {
