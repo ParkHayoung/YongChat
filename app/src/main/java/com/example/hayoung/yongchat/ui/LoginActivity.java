@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.hayoung.yongchat.R;
-import com.example.hayoung.yongchat.model.ChatRoom;
 import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.session.UserSession;
 import com.facebook.AccessToken;
@@ -31,9 +30,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.wang.avi.AVLoadingIndicatorView;
-
-import java.util.Arrays;
-import java.util.Date;
 
 public class LoginActivity extends AppCompatActivity {
     private CallbackManager mCallbackManager;
@@ -115,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signUpOrSignInUser(final User user) {
         final DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-        final DatabaseReference roomsRef = FirebaseDatabase.getInstance().getReference("rooms");
+
         usersRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -124,30 +120,15 @@ public class LoginActivity extends AppCompatActivity {
 
                 if (dataSnapshot.getChildrenCount() == 0) {
                     // 가입시켜야함
-                    usersRef.push().setValue(user);
-
+                    usersRef.child(user.getUid()).setValue(user);
                     // 로컬 사용자 세션에 사용자 등록
                     UserSession.getInstance().setCurrentUser(user);
-
-//                    ChatRoom chatRoom = new ChatRoom();
-//                    chatRoom.setUnreadCount(0);
-//                    chatRoom.setMembers(Arrays.asList(user));
-//                    chatRoom.setMessage("나와의 즐거운 대화를 시작해보자.");
-//                    chatRoom.setDateTime(new Date());
-//                    chatRoom.setUserId(user.getUid());
-//                    chatRoom.setTag(user.getUid());
-//
-//                    String roomId = roomsRef.push().getKey();
-//                    chatRoom.setRoomId(roomId);
-//                    roomsRef.child(roomId).setValue(chatRoom);
-
-
-                    goToMain();
                 } else {
                     // 이미 가입되어있음
                     usersRef.child(user.getUid()).setValue(user);
-                    goToMain();
                 }
+
+                goToMain();
             }
 
             @Override
