@@ -5,16 +5,13 @@ import android.support.annotation.NonNull;
 import com.example.hayoung.yongchat.model.TextMessage;
 import com.example.hayoung.yongchat.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by brannpark on 2017. 11. 14..
  */
 
 public class FcmSendMessageBody {
 
-    private List<String> registration_ids;
+    private String to;
     private int time_to_live = 3;
     private String collapse_key;
     private Notification notification;
@@ -23,20 +20,15 @@ public class FcmSendMessageBody {
 
     public FcmSendMessageBody(@NonNull String roomId,
                               @NonNull User sentUser,
-                              @NonNull List<User> recipients,
+                              @NonNull String token,
                               @NonNull TextMessage textMessage) {
 
         this.collapse_key = roomId;
-
-        List<String> tokens = new ArrayList<>();
-        for (User user : recipients) {
-            tokens.add(user.getToken());
-        }
-        this.registration_ids = tokens;
+        this.to = token;
         this.notification = new Notification();
         notification.title = sentUser.getName();
         notification.body = textMessage.getMessage();
-
+        notification.tag = roomId;
         //this.data = new Data();
 
     }
@@ -44,6 +36,8 @@ public class FcmSendMessageBody {
     public static class Notification {
         String title;
         String body;
+        String sound = "default";
+        String tag;
     }
 
 //    public static class Data {

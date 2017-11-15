@@ -5,19 +5,17 @@ import android.os.Parcelable;
 
 import com.google.firebase.auth.FirebaseUser;
 
-import java.io.Serializable;
-
 /**
  * Created by hayoung on 2017. 11. 5..
  */
 
 public class User implements Parcelable {
 
-    String uid;
-    String email;
-    String name;
-    String imageUrl;
-    String token;
+    private String uid;
+    private String email;
+    private String name;
+    private String imageUrl;
+    private String token;
 
 
     public User() {

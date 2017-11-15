@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.hayoung.yongchat.R;
+import com.example.hayoung.yongchat.db.Database;
 import com.example.hayoung.yongchat.model.User;
+import com.example.hayoung.yongchat.service.UserService;
 import com.example.hayoung.yongchat.session.UserSession;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -25,8 +28,6 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -97,7 +98,6 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-                            //FirebaseUser user = mAuth.getCurrentUser();
                             User user = new User(mAuth.getCurrentUser());
                             signUpOrSignInUser(user);
                         } else {
@@ -110,24 +110,30 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signUpOrSignInUser(final User user) {
-        final DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference("users");
-
-        usersRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+        Database.users().orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                //push token update
-                user.setToken(FirebaseInstanceId.getInstance().getToken());
+                String token = FirebaseInstanceId.getInstance().getToken();
+                user.setToken(token);
 
                 if (dataSnapshot.getChildrenCount() == 0) {
-                    // 가입시켜야함
-                    usersRef.child(user.getUid()).setValue(user);
+                    // 신규가입
+                    Database.users().child(user.getUid()).setValue(user);
                     // 로컬 사용자 세션에 사용자 등록
                     UserSession.getInstance().setCurrentUser(user);
                 } else {
-                    // 이미 가입되어있음
-                    usersRef.child(user.getUid()).setValue(user);
+                    User savedUser = dataSnapshot.getChildren().iterator().next().getValue(User.class);
+                    if (savedUser != null && !TextUtils.equals(savedUser.getToken(), token)) {
+                        // 푸시토큰 설정
+                        savedUser.setToken(token);
+                        // 사용자 정보 업데이트
+                        new UserService().updateUser(savedUser);
+                    }
+                    // 로컬 사용자 세션에 사용자 등록
+                    UserSession.getInstance().setCurrentUser(savedUser);
                 }
 
+                // 앱 메인 화면 이동
                 goToMain();
             }
 
