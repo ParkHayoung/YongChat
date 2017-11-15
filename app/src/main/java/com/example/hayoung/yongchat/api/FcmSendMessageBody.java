@@ -18,6 +18,7 @@ public class FcmSendMessageBody {
     private int time_to_live = 3;
     private String collapse_key;
     private Notification notification;
+    private String priority = "high";
     //private Data data;
 
     public FcmSendMessageBody(@NonNull String roomId,
