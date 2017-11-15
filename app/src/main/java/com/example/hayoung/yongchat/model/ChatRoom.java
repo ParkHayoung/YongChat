@@ -3,9 +3,7 @@ package com.example.hayoung.yongchat.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,7 +17,7 @@ public class ChatRoom implements Parcelable {
     List<User> members;
     String message;
     int unreadCount;
-    Date dateTime;
+    long messageCreatedAt;
     String userId;
     String tag;
 
@@ -55,12 +53,12 @@ public class ChatRoom implements Parcelable {
         this.unreadCount = unreadCount;
     }
 
-    public Date getDateTime() {
-        return dateTime;
+    public long getMessageCreatedAt() {
+        return messageCreatedAt;
     }
 
-    public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
+    public void setMessageCreatedAt(long messageCreatedAt) {
+        this.messageCreatedAt = messageCreatedAt;
     }
 
     public String getUserId() {
@@ -97,7 +95,7 @@ public class ChatRoom implements Parcelable {
         dest.writeList(this.members);
         dest.writeString(this.message);
         dest.writeInt(this.unreadCount);
-        dest.writeLong(this.dateTime != null ? this.dateTime.getTime() : -1);
+        dest.writeLong(this.messageCreatedAt);
         dest.writeString(this.userId);
         dest.writeString(this.tag);
         dest.writeString(this.roomId);
@@ -108,12 +106,11 @@ public class ChatRoom implements Parcelable {
     }
 
     protected ChatRoom(Parcel in) {
-        this.members = new ArrayList<User>();
+        this.members = new ArrayList<>();
         in.readList(this.members, User.class.getClassLoader());
         this.message = in.readString();
         this.unreadCount = in.readInt();
-        long tmpDateTime = in.readLong();
-        this.dateTime = tmpDateTime == -1 ? null : new Date(tmpDateTime);
+        this.messageCreatedAt = in.readLong();
         this.userId = in.readString();
         this.tag = in.readString();
         this.roomId = in.readString();

@@ -17,6 +17,7 @@ import com.example.hayoung.yongchat.session.UserSession;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,10 +54,9 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
     public void onBindViewHolder(ChatViewHolder holder, int position) {
         TextMessage textMessage = items.get(position);
 
-        holder.dateTextView.setText(dateFormat.format(textMessage.getDate()));
+        holder.dateTextView.setText(dateFormat.format(new Date(textMessage.getCreatedAt())));
         holder.messageTextView.setText(textMessage.getMessage());
         holder.nameTextView.setText(textMessage.getSent().getName());
-//        holder.unreadCountTextView.setText(String.valueOf(textMessage.getUnreadCount()));
 
         Glide.with(holder.profileImageView)
                 .load(items.get(position).getSent().getImageUrl())

@@ -34,7 +34,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -159,7 +158,7 @@ public class FriendListFragment extends Fragment {
                     chatRoom.setTitle(friend.getName());
                     chatRoom.setUnreadCount(chatRoom.getMembers().size() - 1);
                     chatRoom.setUserId(me.getUid());
-                    chatRoom.setDateTime(new Date());
+                    chatRoom.setMessageCreatedAt(System.currentTimeMillis());
                     chatRoom.setTag(friend.getUid());
                 }
 

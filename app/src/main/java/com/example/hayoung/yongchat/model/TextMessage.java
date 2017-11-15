@@ -1,14 +1,12 @@
 package com.example.hayoung.yongchat.model;
 
-import java.util.Date;
-
 /**
  * Created by hayoung on 2017. 11. 5..
  */
 
 public class TextMessage {
     String message;
-    Date date;
+    long createdAt;
     User sent;
     int unreadCount;
 
@@ -36,11 +34,11 @@ public class TextMessage {
         this.unreadCount = unreadCount;
     }
 
-    public Date getDate() {
-        return date;
+    public long getCreatedAt() {
+        return createdAt;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -10,6 +10,7 @@ import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.model.ChatRoom;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapte
         holder.titleTextView.setText(chatRoom.getTitle());
         holder.messageTextView.setText(chatRoom.getMessage());
 //        holder.unreadCountTextView.setText(String.valueOf(chatRoom.getUnreadCount()));
-        holder.dateTextView.setText(dateFormat.format(chatRoom.getDateTime()));
+        holder.dateTextView.setText(dateFormat.format(new Date(chatRoom.getMessageCreatedAt())));
 
     }
 

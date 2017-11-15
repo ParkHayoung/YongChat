@@ -28,7 +28,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -101,13 +100,13 @@ public class ChatActivity extends AppCompatActivity {
         TextMessage textMessage = new TextMessage();
         textMessage.setMessage(message);
         textMessage.setSent(me);
-        textMessage.setDate(new Date());
+        textMessage.setCreatedAt(System.currentTimeMillis());
         textMessage.setUnreadCount(mMyRoom.getMembers().size());
         mMessageRef.child(mMyRoom.getRoomId()).push().setValue(textMessage);
 
         // 내 방 정보 업데이트
         mMyRoom.setMessage(message);
-        mMyRoom.setDateTime(textMessage.getDate());
+        mMyRoom.setMessageCreatedAt(textMessage.getCreatedAt());
         mRoomsRef.child(mMyRoom.getRoomId()).setValue(mMyRoom);
 
         // 메시지를 받을 친구들이 나와의 채팅방이 개설되어있지 않다면 새롭게 만들고
@@ -143,13 +142,12 @@ public class ChatActivity extends AppCompatActivity {
                         // 생성되어있는 채팅방이 없으므로 새로 생성해야함.
                         room = new ChatRoom();
                         room.setMessage(textMessage.getMessage());
-                        room.setDateTime(textMessage.getDate());
+                        room.setMessageCreatedAt(textMessage.getCreatedAt());
                         room.setTag(me.getUid());
                         room.setUserId(friend.getUid());
                         room.setMembers(mMyRoom.getMembers());
                         room.setTitle(me.getName());
                         room.setUnreadCount(0);
-                        room.setDateTime(new Date());
 
                         String roomId = mRoomsRef.push().getKey();
                         room.setRoomId(roomId);
@@ -165,7 +163,7 @@ public class ChatActivity extends AppCompatActivity {
 
                         // 상대방의 채팅방 정보를 갱신
                         room.setMessage(textMessage.getMessage());
-                        room.setDateTime(textMessage.getDate());
+                        room.setMessageCreatedAt(textMessage.getCreatedAt());
 
                         mRoomsRef.child(room.getRoomId()).setValue(room);
                     }
