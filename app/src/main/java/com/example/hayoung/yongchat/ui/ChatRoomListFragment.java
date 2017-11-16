@@ -3,6 +3,7 @@ package com.example.hayoung.yongchat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -14,14 +15,10 @@ import android.view.ViewGroup;
 
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.RoomRecyclerAdapter;
-import com.example.hayoung.yongchat.db.Database;
 import com.example.hayoung.yongchat.listener.RecyclerItemClickListener;
 import com.example.hayoung.yongchat.model.ChatRoom;
-import com.example.hayoung.yongchat.model.User;
+import com.example.hayoung.yongchat.service.UserService;
 import com.example.hayoung.yongchat.session.UserSession;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,61 +77,26 @@ public class ChatRoomListFragment extends Fragment {
         loadUserRooms();
     }
 
+    private void loadUserRooms() {
+        new UserService().requestUserChatRooms(
+                UserSession.getInstance().getCurrentUser().getUid(),
+                new UserService.DataCallback<ChatRoom>() {
+                    @Override
+                    public void onResults(@NonNull List<ChatRoom> items) {
+                        mRoomRecyclerAdapter.setItems(items);
+                        mRoomRecyclerAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onResult(@NonNull ChatRoom item) {
+                        // non used
+                    }
+                });
+    }
+
     private void goToChatRoom(ChatRoom chatRoom) {
         Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
         chatIntent.putExtra(ChatActivity.EXTRA_KEY_CHAT_ROOM, chatRoom);
         startActivity(chatIntent);
-    }
-
-
-
-    private void loadRooms(final List<String> roomIds) {
-        if (roomIds.isEmpty()) {
-            // complete
-            mRoomRecyclerAdapter.setItems(rooms);
-            mRoomRecyclerAdapter.notifyDataSetChanged();
-            return ;
-        }
-        String roomId = roomIds.get(0);
-        roomIds.remove(0);
-
-        Database.rooms().child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                ChatRoom room = dataSnapshot.getValue(ChatRoom.class);
-                if (room != null) {
-                    rooms.add(room);
-                    loadRooms(roomIds);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void loadUserRooms() {
-        User me = UserSession.getInstance().getCurrentUser();
-        Database.userRooms().child(me.getUid()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> roomIds = new ArrayList<>();
-                for (DataSnapshot itemSnapshot : dataSnapshot.getChildren()) {
-                    String roomId = itemSnapshot.getValue(String.class);
-                    if (roomId != null) {
-                        roomIds.add(roomId);
-                    }
-                }
-                rooms.clear();
-                loadRooms(roomIds);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 }
