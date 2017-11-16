@@ -125,9 +125,13 @@ public class FriendListFragment extends Fragment {
         User me = UserSession.getInstance().getCurrentUser();
 
         // 새로운 채팅방을 생성
-        Map<String, Boolean> roomMembers = new HashMap<>();
-        roomMembers.put(friend.getUid(), true);
-        roomMembers.put(me.getUid(),true);
+//        Map<String, Boolean> roomMembers = new HashMap<>();
+//        roomMembers.put(friend.getUid(), true);
+//        roomMembers.put(me.getUid(),true);
+
+        List<User> roomMembers = new ArrayList<>();
+        roomMembers.add(me);
+        roomMembers.add(friend);
 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setMembers(roomMembers);

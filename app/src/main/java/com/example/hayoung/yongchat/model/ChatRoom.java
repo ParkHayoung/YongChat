@@ -3,7 +3,9 @@ package com.example.hayoung.yongchat.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,7 +16,7 @@ public class ChatRoom implements Parcelable {
 
     private String roomId; // 채팅방 아이디
     private String title; // 채팅방 타이틀
-    private Map<String, Boolean> members; // 채팅방 멤버들
+    private List<User> members; // 채팅방 멤버들
     private String message; // 채팅방 마지막 메시지
     private long messageCreatedAt; // 채팅방 마지막 메시지가 작성된 시간
     private String tag; // 채팅방 태그
@@ -27,11 +29,11 @@ public class ChatRoom implements Parcelable {
         this.title = title;
     }
 
-    public Map<String, Boolean> getMembers() {
+    public List<User> getMembers() {
         return members;
     }
 
-    public void setMembers(Map<String, Boolean> members) {
+    public void setMembers(List<User> members) {
         this.members = members;
     }
 
@@ -74,7 +76,7 @@ public class ChatRoom implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeMap(this.members);
+        dest.writeList(this.members);
         dest.writeString(this.message);
         dest.writeLong(this.messageCreatedAt);
         dest.writeString(this.tag);
@@ -86,8 +88,8 @@ public class ChatRoom implements Parcelable {
     }
 
     protected ChatRoom(Parcel in) {
-        this.members = new HashMap<>();
-        in.readMap(this.members, User.class.getClassLoader());
+        this.members = new ArrayList<>();
+        in.readList(this.members, User.class.getClassLoader());
         this.message = in.readString();
         this.messageCreatedAt = in.readLong();
         this.tag = in.readString();

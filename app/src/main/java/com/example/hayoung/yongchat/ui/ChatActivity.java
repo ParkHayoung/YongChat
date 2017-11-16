@@ -284,7 +284,10 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendFcmToRecipients(@NonNull final TextMessage textMessage) {
-        for (String uid : mRoom.getMembers().keySet()) {
+
+        for (int i = 0; i < mRoom.getMembers().size(); i++) {
+            String uid = mRoom.getMembers().get(i).getUid();
+
             Database.users().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -300,6 +303,22 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
+//        for (String uid : mRoom.getMembers().keySet()) {
+//            Database.users().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    User user = dataSnapshot.getValue(User.class);
+//                    if (user != null) {
+//                        requestPostFcmSend(textMessage, user.getToken());
+//                    }
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            });
+//        }
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -317,9 +336,13 @@ public class ChatActivity extends AppCompatActivity {
         rooms().child(roomId).setValue(mRoom, listener);
 
         // 사용자 - 대화방 매칭 데이터 생성
-        for (String uid : mRoom.getMembers().keySet()) {
+        for (int i = 0; i < mRoom.getMembers().size(); i++) {
+            String uid = mRoom.getMembers().get(i).getUid();
             Database.userRooms().child(uid).push().setValue(roomId);
         }
+//        for (String uid : mRoom.getMembers().keySet()) {
+//            Database.userRooms().child(uid).push().setValue(roomId);
+//        }
     }
 
     private void loadChat() {
