@@ -28,9 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -135,7 +133,6 @@ public class FriendListFragment extends Fragment {
 
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setMembers(roomMembers);
-        chatRoom.setTitle(friend.getName());
         chatRoom.setMessageCreatedAt(System.currentTimeMillis());
         chatRoom.setTag(friend.getUid());
 

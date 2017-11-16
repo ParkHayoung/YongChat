@@ -73,7 +73,7 @@ public class ChatActivity extends AppCompatActivity {
         mRecyclerView.setAdapter(mChatRecyclerAdapter);
 
         TextView userNameTextView = (TextView) findViewById(R.id.user_name_text_view);
-        userNameTextView.setText(mRoom.getTitle());
+        userNameTextView.setText(mRoom.getRoomTitle(UserSession.getInstance().getCurrentUser()));
 
         mChatEditText = (EditText) findViewById(R.id.chat_edit_text);
         Button sendButton = (Button) findViewById(R.id.send_button);

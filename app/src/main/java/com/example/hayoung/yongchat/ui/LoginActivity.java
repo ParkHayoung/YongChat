@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -13,7 +12,6 @@ import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.db.Database;
 import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.service.UserService;
-import com.example.hayoung.yongchat.session.UserSession;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -116,21 +114,13 @@ public class LoginActivity extends AppCompatActivity {
                 String token = FirebaseInstanceId.getInstance().getToken();
                 user.setToken(token);
 
+                UserService userService = new UserService();
+
                 if (dataSnapshot.getChildrenCount() == 0) {
                     // 신규가입
-                    Database.users().child(user.getUid()).setValue(user);
-                    // 로컬 사용자 세션에 사용자 등록
-                    UserSession.getInstance().setCurrentUser(user);
+                    userService.signUpUser(user);
                 } else {
-                    User savedUser = dataSnapshot.getChildren().iterator().next().getValue(User.class);
-                    if (savedUser != null && !TextUtils.equals(savedUser.getToken(), token)) {
-                        // 푸시토큰 설정
-                        savedUser.setToken(token);
-                        // 사용자 정보 업데이트
-                        new UserService().updateUser(savedUser);
-                    }
-                    // 로컬 사용자 세션에 사용자 등록
-                    UserSession.getInstance().setCurrentUser(savedUser);
+                    userService.updateUser(user);
                 }
 
                 // 앱 메인 화면 이동

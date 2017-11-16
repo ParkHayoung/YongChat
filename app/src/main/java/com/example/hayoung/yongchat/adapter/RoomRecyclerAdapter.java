@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.model.ChatRoom;
+import com.example.hayoung.yongchat.model.User;
+import com.example.hayoung.yongchat.session.UserSession;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,13 +35,14 @@ public class RoomRecyclerAdapter extends RecyclerView.Adapter<RoomRecyclerAdapte
     @Override
     public void onBindViewHolder(RoomViewHolder holder, int position) {
         ChatRoom chatRoom = items.get(position);
-
-        holder.titleTextView.setText(chatRoom.getTitle());
+        User me = UserSession.getInstance().getCurrentUser();
+        holder.titleTextView.setText(chatRoom.getRoomTitle(me));
         holder.messageTextView.setText(chatRoom.getMessage());
 //        holder.unreadCountTextView.setText(String.valueOf(chatRoom.getUnreadCount()));
         holder.dateTextView.setText(dateFormat.format(new Date(chatRoom.getMessageCreatedAt())));
-
     }
+
+
 
     @Override
     public int getItemCount() {

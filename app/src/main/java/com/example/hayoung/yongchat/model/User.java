@@ -32,6 +32,15 @@ public class User implements Parcelable {
         imageUrl = firebaseUser.getPhotoUrl().toString();
     }
 
+    public void update(User user) {
+        this.uid = user.uid;
+        this.email = user.email;
+        this.name = user.name;
+        this.imageUrl = user.imageUrl;
+        this.token = user.token;
+    }
+
+
     public String getUid() {
         return uid;
     }
