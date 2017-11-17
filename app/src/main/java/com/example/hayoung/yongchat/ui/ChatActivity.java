@@ -1,7 +1,6 @@
 package com.example.hayoung.yongchat.ui;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,14 +21,13 @@ import com.example.hayoung.yongchat.model.ChatRoom;
 import com.example.hayoung.yongchat.model.TextMessage;
 import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.session.UserSession;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
 
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -54,6 +52,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private Retrofit retrofit;
     private FcmApi api;
+    private boolean readyForNewMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,14 +82,11 @@ public class ChatActivity extends AppCompatActivity {
                 if(mChatEditText.getText().length() > 0) {
                     sendTextMessage(mChatEditText.getText().toString());
                     mChatEditText.setText("");
-                } else {
-                    return;
                 }
-                loadChat();
             }
         });
 
-        loadChat();
+        loadMessages();
     }
 
     private void initRetrofitService() {
@@ -114,7 +110,7 @@ public class ChatActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                     // 채팅메시지 목록 옵저버 등록
-                    loadChat();
+                    loadMessages();
                     sendTextMessage(message);
                 }
             });
@@ -192,72 +188,6 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-
-    /**
-     * 채팅방에 있는 사용자들에게 메시지를 보내기 전에
-     * 각각의 사용자들의 채팅방이 생성되어있는지 확인하고
-     * 생성되어있지 않다면 새롭게 생성한다.
-     *
-     * @param textMessage 보낼 메시지.
-     */
-    private void createFriendsChatRoomIfNotExist(final TextMessage textMessage) {
-        final User me = UserSession.getInstance().getCurrentUser();
-
-//        List<User> friends = mRoom.getMembers();
-//        for (final User user : friends) {
-//            if (user.getUid().equals(me.getUid())) {
-//                continue;
-//            }
-//
-//            Database.rooms().orderByChild("userId").equalTo(user.getUid())
-//                    .addListenerForSingleValueEvent(new ValueEventListener() {
-//
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    ChatRoom room = null;
-//                    for (DataSnapshot itemSnapshot : dataSnapshot.getChildren()) {
-//                        ChatRoom chatRoom = itemSnapshot.getValue(ChatRoom.class);
-//                        if (chatRoom != null && me.getUid().equals(chatRoom.getTag())) {
-//                            // 이미 상대방과 나와의 1:1 채팅이 생성되어있음
-//                            room = chatRoom;
-//                            break;
-//                        }
-//                    }
-//
-//                    if (room == null) {
-//                        // 생성되어있는 상대방과 나와의 채팅방이 없으므로 새로 생성해야함.
-//                        room = new ChatRoom();
-//                        room.setMessage(textMessage.getMessage());
-//                        room.setMessageCreatedAt(textMessage.getCreatedAt());
-//                        room.setTag(me.getUid());
-//                                room.setMembers(mRoom.getMembers());
-//                        room.setTitle(me.getName());
-//
-//                        String roomId = Database.rooms().push().getKey();
-//                        room.setRoomId(roomId);
-//                        Database.rooms().child(roomId).setValue(room);
-//
-//                    } else {
-//                        // 상대방의 채팅방 정보를 갱신
-//                        room.setMessage(textMessage.getMessage());
-//                        room.setMessageCreatedAt(textMessage.getCreatedAt());
-//                        Database.rooms().child(room.getRoomId()).setValue(room);
-//                    }
-//
-//                    // 상대방에게 메시지를 전달
-//                    Database.messages().child(room.getRoomId()).push().setValue(textMessage);
-//                    // 푸시 메시지 발송
-//                    sendFcmToRecipients(textMessage);
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//        }
-    }
-
     private void requestPostFcmSend(@NonNull TextMessage textMessage, String token) {
         User me = UserSession.getInstance().getCurrentUser();
         final FcmSendMessageBody body = new FcmSendMessageBody(mRoom.getRoomId(), me, token, textMessage);
@@ -303,29 +233,6 @@ public class ChatActivity extends AppCompatActivity {
                 }
             });
         }
-//        for (String uid : mRoom.getMembers().keySet()) {
-//            Database.users().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    User user = dataSnapshot.getValue(User.class);
-//                    if (user != null) {
-//                        requestPostFcmSend(textMessage, user.getToken());
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//        }
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                requestPostFcmSend(textMessage, UserSession.getInstance().getCurrentUser().getToken());
-            }
-        }, 5000);
     }
 
     private void createChatRoom(DatabaseReference.CompletionListener listener) {
@@ -340,37 +247,74 @@ public class ChatActivity extends AppCompatActivity {
             String uid = mRoom.getMembers().get(i).getUid();
             Database.userRooms().child(uid).push().setValue(roomId);
         }
-//        for (String uid : mRoom.getMembers().keySet()) {
-//            Database.userRooms().child(uid).push().setValue(roomId);
-//        }
     }
 
-    private void loadChat() {
+    private void observeNewMessage() {
         String roomId = mRoom.getRoomId();
         if (roomId == null) {
             return ;
         }
 
-        Database.messages().child(roomId).addValueEventListener(new ValueEventListener() {
+        Database.messages().child(roomId).limitToLast(1).addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<TextMessage> messageList = new ArrayList<>();
-
-                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                    TextMessage textMessage = dataSnapshot1.getValue(TextMessage.class);
-                    messageList.add(textMessage);
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (!readyForNewMessage) {
+                    return ;
                 }
 
-                Collections.reverse(messageList);
-                mChatRecyclerAdapter.setItems(messageList);
+                LinkedList<TextMessage> items = mChatRecyclerAdapter.getItems();
+                items.addFirst(dataSnapshot.getValue(TextMessage.class));
                 mChatRecyclerAdapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                // non used
+            }
 
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                // non used
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                // non used
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // non used
             }
         });
+    }
+
+    private void loadMessages() {
+        String roomId = mRoom.getRoomId();
+        if (roomId == null) {
+            return ;
+        }
+
+        readyForNewMessage = false;
+        observeNewMessage();
+        Database.messages().child(roomId).limitToLast(300).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                LinkedList<TextMessage> items = mChatRecyclerAdapter.getItems();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    items.addFirst(snapshot.getValue(TextMessage.class));
+                }
+                mChatRecyclerAdapter.notifyDataSetChanged();
+                readyForNewMessage = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // non used
+            }
+        });
+
+
     }
 
 }

@@ -16,9 +16,8 @@ import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.session.UserSession;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  * Created by hayoung on 2017. 11. 5..
@@ -29,7 +28,7 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
     private static final int TYPE_TM_ME = 0;
     private static final int TYPE_TM_YOU = 1;
 
-    private List<TextMessage> items = new ArrayList<>();
+    private LinkedList<TextMessage> items = new LinkedList<>();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
     private User me;
 
@@ -100,11 +99,11 @@ public class ChatRecyclerAdapter extends RecyclerView.Adapter<ChatRecyclerAdapte
         }
     }
 
-    public void setItems(@NonNull List<TextMessage> items) {
+    public void setItems(@NonNull LinkedList<TextMessage> items) {
         this.items = items;
     }
 
-    public List<TextMessage> getItems() {
+    public LinkedList<TextMessage> getItems() {
         return items;
     }
 }
