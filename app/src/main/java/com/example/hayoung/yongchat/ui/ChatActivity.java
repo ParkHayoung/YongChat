@@ -2,7 +2,6 @@ package com.example.hayoung.yongchat.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -73,7 +72,7 @@ public class ChatActivity extends AppCompatActivity {
             finish();
             return;
         }
-        
+
         setContentView(R.layout.activity_chat);
 
         initRetrofitService();
@@ -197,12 +196,7 @@ public class ChatActivity extends AppCompatActivity {
         Database.messages().child(mRoom.getRoomId()).push().setValue(textMessage);
 
         // 푸시 메시지 발송
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                sendFcmToRecipients(textMessage);
-            }
-        }, 3000);
+        sendFcmToRecipients(textMessage);
 
         // 내 방 정보 업데이트
         mRoom.setMessage(textMessage.getMessage());
@@ -242,7 +236,7 @@ public class ChatActivity extends AppCompatActivity {
         for (int i = 0; i < mRoom.getMembers().size(); i++) {
             String uid = mRoom.getMembers().get(i).getUid();
             if (uid.equals(me.getUid())) {
-                //continue;
+                continue;
             }
 
             Database.users().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
