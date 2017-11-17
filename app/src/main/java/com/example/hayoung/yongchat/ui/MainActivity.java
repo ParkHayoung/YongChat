@@ -1,27 +1,16 @@
 package com.example.hayoung.yongchat.ui;
 
 import android.content.DialogInterface;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.support.design.widget.FloatingActionButton;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.MainPagerAdapter;
-import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.session.UserSession;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
     private TabLayout mTabLayout;
@@ -30,6 +19,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 사용자 세션이 없다면 (로그아웃 상태),
+        // 현재화면 종료하고 로그인화면으로 보내기
+        if (!UserSession.getInstance().isLoggedIn()) {
+            LoginActivity.start(this);
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
 
         mTabLayout = (TabLayout)findViewById(R.id.tab_layout);

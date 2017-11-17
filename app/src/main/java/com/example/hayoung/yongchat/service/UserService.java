@@ -17,11 +17,6 @@ import java.util.List;
 
 public class UserService {
 
-    public interface DataCallback<T> {
-        void onResults(@NonNull List<T> items);
-        void onResult(@NonNull T item);
-    }
-
     public void signUpUser(@NonNull User user) {
         // users 데이터베이스에 사용자 추가
         // FirebaseUser 의 uid 를 키로 사용

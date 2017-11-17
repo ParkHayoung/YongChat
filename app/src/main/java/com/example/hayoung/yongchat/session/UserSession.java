@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.example.hayoung.yongchat.model.User;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 
 /**
@@ -31,6 +32,11 @@ public class UserSession {
             }
             return userSession;
         }
+    }
+
+    public boolean isLoggedIn() {
+        return FirebaseAuth.getInstance().getCurrentUser() != null
+                && getCurrentUser() != null;
     }
 
     public void setCurrentUser(User user) {
