@@ -2,6 +2,7 @@ package com.example.hayoung.yongchat.api;
 
 import android.support.annotation.NonNull;
 
+import com.example.hayoung.yongchat.model.ChatRoom;
 import com.example.hayoung.yongchat.model.TextMessage;
 import com.example.hayoung.yongchat.model.User;
 
@@ -18,19 +19,22 @@ public class FcmSendMessageBody {
     private String priority = "high";
     private Data data;
 
-    public FcmSendMessageBody(@NonNull String roomId,
-                              @NonNull User sentUser,
-                              @NonNull String token,
+    public FcmSendMessageBody(@NonNull ChatRoom room,
+                              @NonNull User fromUser,
+                              @NonNull User toUser,
                               @NonNull TextMessage textMessage) {
 
-        this.collapse_key = roomId;
-        this.to = token;
-        this.notification = new Notification();
-        notification.title = sentUser.getName();
+        collapse_key = room.getRoomId();
+        to = toUser.getToken();
+
+        notification = new Notification();
+        notification.title = fromUser.getName();
         notification.body = textMessage.getMessage();
         notification.sound = "nyang";
-        notification.tag = roomId;
-        this.data = new Data();
+        notification.tag = room.getRoomId();
+        notification.click_action = "chat";
+        data = new Data();
+        data.room_id = room.getRoomId();
 
     }
 
@@ -39,9 +43,10 @@ public class FcmSendMessageBody {
         private String body;
         private String sound;
         private String tag;
+        private String click_action;
     }
 
     public static class Data {
-
+        private String room_id;
     }
 }

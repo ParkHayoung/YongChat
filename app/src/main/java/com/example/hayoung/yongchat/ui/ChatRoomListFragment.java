@@ -17,6 +17,7 @@ import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.adapter.RoomRecyclerAdapter;
 import com.example.hayoung.yongchat.listener.RecyclerItemClickListener;
 import com.example.hayoung.yongchat.model.ChatRoom;
+import com.example.hayoung.yongchat.service.DataCallback;
 import com.example.hayoung.yongchat.service.UserService;
 import com.example.hayoung.yongchat.session.UserSession;
 
@@ -80,7 +81,7 @@ public class ChatRoomListFragment extends Fragment {
     private void loadUserRooms() {
         new UserService().requestUserChatRooms(
                 UserSession.getInstance().getCurrentUser().getUid(),
-                new UserService.DataCallback<ChatRoom>() {
+                new DataCallback<ChatRoom>() {
                     @Override
                     public void onResults(@NonNull List<ChatRoom> items) {
                         mRoomRecyclerAdapter.setItems(items);

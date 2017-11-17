@@ -1,11 +1,14 @@
 package com.example.hayoung.yongchat.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +23,8 @@ import com.example.hayoung.yongchat.db.Database;
 import com.example.hayoung.yongchat.model.ChatRoom;
 import com.example.hayoung.yongchat.model.TextMessage;
 import com.example.hayoung.yongchat.model.User;
+import com.example.hayoung.yongchat.service.DataCallback;
+import com.example.hayoung.yongchat.service.RoomService;
 import com.example.hayoung.yongchat.session.UserSession;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -49,14 +55,25 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mChatEditText;
     private ChatRecyclerAdapter mChatRecyclerAdapter;
     private RecyclerView mRecyclerView;
+    private TextView mTitleTextView;
 
     private Retrofit retrofit;
     private FcmApi api;
     private boolean readyForNewMessage;
+    private ChildEventListener newMessagesEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 사용자 세션이 없다면 (로그아웃 상태),
+        // 현재화면 종료하고 로그인화면으로 보내기
+        if (!UserSession.getInstance().isLoggedIn()) {
+            LoginActivity.start(this);
+            finish();
+            return;
+        }
+        
         setContentView(R.layout.activity_chat);
 
         initRetrofitService();
@@ -71,8 +88,8 @@ public class ChatActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true));
         mRecyclerView.setAdapter(mChatRecyclerAdapter);
 
-        TextView userNameTextView = (TextView) findViewById(R.id.user_name_text_view);
-        userNameTextView.setText(mRoom.getRoomTitle(UserSession.getInstance().getCurrentUser()));
+        mTitleTextView = (TextView) findViewById(R.id.user_name_text_view);
+        mTitleTextView.setText(mRoom.getRoomTitle(UserSession.getInstance().getCurrentUser()));
 
         mChatEditText = (EditText) findViewById(R.id.chat_edit_text);
         Button sendButton = (Button) findViewById(R.id.send_button);
@@ -87,6 +104,56 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         loadMessages();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        handleOpenedThroughNotification(intent);
+    }
+
+    private void unsubscribeNewMessages() {
+        if (mRoom != null && newMessagesEventListener != null) {
+            Database.messages().child(mRoom.getRoomId()).removeEventListener(newMessagesEventListener);
+        }
+
+    }
+
+    private void handleOpenedThroughNotification(Intent intent) {
+        String roomId = intent.getStringExtra("room_id");
+        if (TextUtils.isEmpty(roomId)) {
+            return ;
+        }
+
+        if (mRoom != null && mRoom.getRoomId().equals(roomId)) {
+            return ;
+        }
+
+        unsubscribeNewMessages();
+        mTitleTextView.setText(null);
+        mChatRecyclerAdapter.getItems().clear();
+        mChatRecyclerAdapter.notifyDataSetChanged();
+
+        // Notification 을 터치해서 진입함
+        new RoomService().requestRoom(roomId, new DataCallback<ChatRoom>() {
+            @Override
+            public void onResults(@NonNull List<ChatRoom> items) {
+                // non used
+            }
+
+            @Override
+            public void onResult(@NonNull ChatRoom item) {
+                mRoom = item;
+
+                Intent baseIntent = getIntent();
+                baseIntent.putExtra(EXTRA_KEY_CHAT_ROOM, mRoom);
+                setIntent(baseIntent);
+
+                mTitleTextView.setText(mRoom.getRoomTitle(UserSession.getInstance().getCurrentUser()));
+                loadMessages();
+            }
+        });
     }
 
     private void initRetrofitService() {
@@ -130,7 +197,12 @@ public class ChatActivity extends AppCompatActivity {
         Database.messages().child(mRoom.getRoomId()).push().setValue(textMessage);
 
         // 푸시 메시지 발송
-        sendFcmToRecipients(textMessage);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                sendFcmToRecipients(textMessage);
+            }
+        }, 3000);
 
         // 내 방 정보 업데이트
         mRoom.setMessage(textMessage.getMessage());
@@ -140,9 +212,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    private void requestPostFcmSend(@NonNull TextMessage textMessage, String token) {
+    private void requestPostFcmSend(@NonNull TextMessage textMessage, User recipient) {
         User me = UserSession.getInstance().getCurrentUser();
-        final FcmSendMessageBody body = new FcmSendMessageBody(mRoom.getRoomId(), me, token, textMessage);
+        final FcmSendMessageBody body = new FcmSendMessageBody(mRoom, me, recipient, textMessage);
 
         Call<ResponseBody> call = api.sendMessage("key=" + FCM_API_KEY, body);
         call.enqueue(new Callback<ResponseBody>() {
@@ -170,7 +242,7 @@ public class ChatActivity extends AppCompatActivity {
         for (int i = 0; i < mRoom.getMembers().size(); i++) {
             String uid = mRoom.getMembers().get(i).getUid();
             if (uid.equals(me.getUid())) {
-                continue;
+                //continue;
             }
 
             Database.users().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -178,7 +250,7 @@ public class ChatActivity extends AppCompatActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     User user = dataSnapshot.getValue(User.class);
                     if (user != null) {
-                        requestPostFcmSend(textMessage, user.getToken());
+                        requestPostFcmSend(textMessage, user);
                     }
                 }
 
@@ -204,13 +276,13 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void observeNewMessage() {
+    private void subscribeNewMessages() {
         String roomId = mRoom.getRoomId();
         if (roomId == null) {
             return ;
         }
 
-        Database.messages().child(roomId).limitToLast(1).addChildEventListener(new ChildEventListener() {
+        newMessagesEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (!readyForNewMessage) {
@@ -241,7 +313,19 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
                 // non used
             }
-        });
+        };
+
+        Database.messages()
+                .child(roomId)
+                .limitToLast(1)
+                .addChildEventListener(newMessagesEventListener);
+    }
+
+    @Override
+    public void finish() {
+        Intent mainIntent = new Intent(this, MainActivity.class);
+        mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(mainIntent);
     }
 
     private void loadMessages() {
@@ -251,7 +335,7 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         readyForNewMessage = false;
-        observeNewMessage();
+        subscribeNewMessages();
         Database.messages().child(roomId).limitToLast(300).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

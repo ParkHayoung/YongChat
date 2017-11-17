@@ -1,5 +1,6 @@
 package com.example.hayoung.yongchat.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +13,7 @@ import com.example.hayoung.yongchat.R;
 import com.example.hayoung.yongchat.db.Database;
 import com.example.hayoung.yongchat.model.User;
 import com.example.hayoung.yongchat.service.UserService;
+import com.example.hayoung.yongchat.session.UserSession;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -37,9 +39,20 @@ public class LoginActivity extends AppCompatActivity {
 
     private LoginButton mLoginButton;
 
+    public static void start(@NonNull Context context) {
+        Intent intent = new Intent(context, LoginActivity.class);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (UserSession.getInstance().isLoggedIn()) {
+            goToMain();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
 
         mAuth = FirebaseAuth.getInstance();
