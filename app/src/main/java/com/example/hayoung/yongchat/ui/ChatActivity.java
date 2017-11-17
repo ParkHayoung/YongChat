@@ -120,7 +120,7 @@ public class ChatActivity extends AppCompatActivity {
         User me = UserSession.getInstance().getCurrentUser();
 
         // room 이 있으면 바로 메시지 전송
-        TextMessage textMessage = new TextMessage();
+        final TextMessage textMessage = new TextMessage();
         textMessage.setMessage(message);
         textMessage.setSent(me);
         textMessage.setCreatedAt(System.currentTimeMillis());
@@ -137,56 +137,8 @@ public class ChatActivity extends AppCompatActivity {
         mRoom.setMessageCreatedAt(textMessage.getCreatedAt());
 
         Database.rooms().child(mRoom.getRoomId()).setValue(mRoom);
-
-
-//        // 대화방에 있는 사람들 각각의 채팅방에 메시지를 전송
-//        for (final String friendUid : mRoom.getMembers().keySet()) {
-//            if (friendUid.equals(me.getUid())) {
-//                continue;
-//            }
-//
-//            Database.rooms().child(friendUid).addListenerForSingleValueEvent(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if (!dataSnapshot.exists()) {
-//                        // 채팅방 생성
-//                        createFriendChatRoomAndSendMessage(friendUid, textMessage);
-//                    } else {
-//                        sendMessageToRoom()
-//                    }
-//
-//                    // 메시지 전송
-//
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
-//
-//            ChatRoom friendChatRoom = new ChatRoom();
-//            friendChatRoom.setRoomId(roomId);
-//            friendChatRoom.setTitle(me.getName());
-//            friendChatRoom.setMembers(mRoom.getMembers());
-//
-//            Database.rooms().child(friendUid).child(roomId).setValue(mRoom);
-//        }
-//
-//
-//        Database.messages().child(mRoom.getRoomId()).push().setValue(textMessage);
-//
-
-
-
-        // 메시지를 받을 친구들이 나와의 채팅방이 개설되어있지 않다면 새롭게 만들고
-        // 메시지를 전달
-        //createFriendsChatRoomIfNotExist(textMessage);
     }
 
-    private void createFriendChatRoomAndSendMessage(String uid, TextMessage textMessage) {
-
-    }
 
     private void requestPostFcmSend(@NonNull TextMessage textMessage, String token) {
         User me = UserSession.getInstance().getCurrentUser();
@@ -214,9 +166,12 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendFcmToRecipients(@NonNull final TextMessage textMessage) {
-
+        User me = UserSession.getInstance().getCurrentUser();
         for (int i = 0; i < mRoom.getMembers().size(); i++) {
             String uid = mRoom.getMembers().get(i).getUid();
+            if (uid.equals(me.getUid())) {
+                continue;
+            }
 
             Database.users().child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

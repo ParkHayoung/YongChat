@@ -16,7 +16,7 @@ public class FcmSendMessageBody {
     private String collapse_key;
     private Notification notification;
     private String priority = "high";
-    //private Data data;
+    private Data data;
 
     public FcmSendMessageBody(@NonNull String roomId,
                               @NonNull User sentUser,
@@ -28,19 +28,20 @@ public class FcmSendMessageBody {
         this.notification = new Notification();
         notification.title = sentUser.getName();
         notification.body = textMessage.getMessage();
+        notification.sound = "nyang";
         notification.tag = roomId;
-        //this.data = new Data();
+        this.data = new Data();
 
     }
 
     public static class Notification {
-        String title;
-        String body;
-        String sound = "default";
-        String tag;
+        private String title;
+        private String body;
+        private String sound;
+        private String tag;
     }
 
-//    public static class Data {
-//
-//    }
+    public static class Data {
+
+    }
 }
